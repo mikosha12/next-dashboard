@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["file://C%3A/projects/nextjs/nextjs-dashboard/app/ui/home.module.css"],"sourcesContent":[".shape {\r\n    height: 0;\r\n    width: 0;\r\n    border-bottom: 30px solid black;\r\n    border-left: 20px solid transparent;\r\n    border-right: 20px solid transparent;\r\n  }"],"names":[],"mappings":"AAAA"}},
+    {"offset": {"line": 8, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}
