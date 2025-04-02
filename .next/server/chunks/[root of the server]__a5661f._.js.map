@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 103, "column": 0}, "map": {"version":3,"sources":["file://C%3A/projects/nextjs/nextjs-dashboard/app/query/route.ts"],"sourcesContent":["import postgres from 'postgres';\n\nconst sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });\n\nasync function listInvoices() {\n  const data = await sql`\n    SELECT invoices.amount, customers.name\n    FROM invoices\n    JOIN customers ON invoices.customer_id = customers.id\n    WHERE invoices.amount = 666;\n  `;\n\n  return data;\n}\n\nexport async function GET() {\n  try {\n    const invoices = await listInvoices();\n    return new Response(JSON.stringify(invoices), { status: 200 });\n  } catch (error: unknown) {\n    console.error('Error fetching invoices:', error);\n    return new Response(\n      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),\n      { status: 500 }\n    );\n  }\n}\n"],"names":[],"mappings":";;;AAAA;;AAEA,MAAM,MAAM,CAAA,GAAA,+LAAA,CAAA,UAAQ,AAAD,EAAE,QAAQ,GAAG,CAAC,YAAY,EAAG;IAAE,KAAK;AAAU;AAEjE,eAAe;IACb,MAAM,OAAO,MAAM,GAAG,CAAC;;;;;EAKvB,CAAC;IAED,OAAO;AACT;AAEO,eAAe;IACpB,IAAI;QACF,MAAM,WAAW,MAAM;QACvB,OAAO,IAAI,SAAS,KAAK,SAAS,CAAC,WAAW;YAAE,QAAQ;QAAI;IAC9D,EAAE,OAAO,OAAgB;QACvB,QAAQ,KAAK,CAAC,4BAA4B;QAC1C,OAAO,IAAI,SACT,KAAK,SAAS,CAAC;YAAE,OAAO,iBAAiB,QAAQ,MAAM,OAAO,GAAG;QAAgB,IACjF;YAAE,QAAQ;QAAI;IAElB;AACF"}},
+    {"offset": {"line": 135, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}

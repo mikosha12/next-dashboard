@@ -296,15 +296,17 @@ __turbopack_esm__({
     "GET": (()=>GET)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$bcryptjs$40$3$2e$0$2e$2$2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/.pnpm/bcryptjs@3.0.2/node_modules/bcryptjs/index.js [app-route] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$postgres$40$3$2e$4$2e$5$2f$node_modules$2f$postgres$2f$src$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/.pnpm/postgres@3.4.5/node_modules/postgres/src/index.js [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$postgres$40$3$2e$4$2e$5$2f$node_modules$2f$postgres$2f$src$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/.pnpm/postgres@3.4.5/node_modules/postgres/src/index.js [app-route] (ecmascript)"); // Import the Sql type
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$placeholder$2d$data$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/app/lib/placeholder-data.ts [app-route] (ecmascript)");
 ;
 ;
 ;
+// Get database URL from environment variables
 const sql = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$postgres$40$3$2e$4$2e$5$2f$node_modules$2f$postgres$2f$src$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"])(process.env.POSTGRES_URL, {
     ssl: 'require'
 });
-async function seedUsers() {
+// Define the function signatures with the sql parameter typed
+async function seedUsers(sql) {
     await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
     await sql`
     CREATE TABLE IF NOT EXISTS users (
@@ -324,7 +326,7 @@ async function seedUsers() {
     }));
     return insertedUsers;
 }
-async function seedInvoices() {
+async function seedInvoices(sql) {
     await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
     await sql`
     CREATE TABLE IF NOT EXISTS invoices (
@@ -342,7 +344,7 @@ async function seedInvoices() {
       `));
     return insertedInvoices;
 }
-async function seedCustomers() {
+async function seedCustomers(sql) {
     await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
     await sql`
     CREATE TABLE IF NOT EXISTS customers (
@@ -359,7 +361,7 @@ async function seedCustomers() {
       `));
     return insertedCustomers;
 }
-async function seedRevenue() {
+async function seedRevenue(sql) {
     await sql`
     CREATE TABLE IF NOT EXISTS revenue (
       month VARCHAR(4) NOT NULL UNIQUE,
@@ -375,21 +377,36 @@ async function seedRevenue() {
 }
 async function GET() {
     try {
-        const result = await sql.begin((sql)=>[
-                seedUsers(),
-                seedCustomers(),
-                seedInvoices(),
-                seedRevenue()
-            ]);
-        return Response.json({
+        // Wrap the seeding logic in a transaction
+        await sql.begin(async (sql)=>{
+            await seedUsers(sql);
+            await seedCustomers(sql);
+            await seedInvoices(sql);
+            await seedRevenue(sql);
+        });
+        return new Response(JSON.stringify({
             message: 'Database seeded successfully'
+        }), {
+            status: 200
         });
     } catch (error) {
-        return Response.json({
-            error
-        }, {
-            status: 500
-        });
+        // Check if the error is an instance of Error
+        if (error instanceof Error) {
+            console.error('Seeding error:', error.message);
+            return new Response(JSON.stringify({
+                error: error.message
+            }), {
+                status: 500
+            });
+        } else {
+            // Handle non-Error types (if any)
+            console.error('Unknown error:', error);
+            return new Response(JSON.stringify({
+                error: 'An unknown error occurred'
+            }), {
+                status: 500
+            });
+        }
     }
 }
 }}),
